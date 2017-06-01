@@ -1,22 +1,12 @@
-const express = require('express')
-const mongoose = require('mongoose')
-
-mongoose.Promise = global.Promise
-
 let env = process.env.NODE_ENV || 'development'
-let port = process.env.PORT || 1337
 
-let app = express()
+let settings = require('./server/config/settings')[env]
 
-app.get('/', (req, res) => {
-  mongoose
-    .connect('mongodb://localhost:27017/generictemplate')
-    .then(() => {
-      console.log('MongoDb Ready!')
+const app = require('express')()
 
-      res.send('Hi!')
-    })
-})
+require('./server/config/database')(settings)
+require('./server/config/express')(app)
+require('./server/config/routes')(app)
 
-app.listen(port)
-console.log(`Server listening on port ${port}...`)
+app.listen(settings.port)
+console.log(`Server listening on port ${settings.port}...`)
